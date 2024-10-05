@@ -65,7 +65,9 @@ def webServer(port=13331):
 
       #Fill in end
       isValid = "HTTP/1.1 404 Not Found\r\n"
-      connectionSocket.sendto(isValid.encode('utf-8'),addr)
+      outputdata = f"Accept-Ranges: bytes\nVary: Accept-Encoding\nConnection: close\n"+ f"Content-Length:{len(message)}\n"+"Content-Type: text/html; charset=UTF-8\r\n\r\n"
+      modMsg = isValid + outputdata
+      connectionSocket.sendto(modMsg.encode('utf-8'),addr)
       #Close client socket
       #Fill in start
       connectionSocket.close()
