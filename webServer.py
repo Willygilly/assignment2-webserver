@@ -9,7 +9,7 @@ def webServer(port=13331):
   serverSocket = socket(AF_INET, SOCK_STREAM)
   
   #Prepare a server socket
-  serverSocket.bind(("", port))
+  serverSocket.bind(("localhost", port))
   
   #Fill in start
   serverSocket.listen(1)
@@ -64,8 +64,14 @@ def webServer(port=13331):
       #Fill in start
 
       #Fill in end
-      isValid = "HTTP/1.1 404 Not Found\r\n"
-      connectionSocket.sendto(isValid.encode('utf-8'),addr)
+      isValid = b"HTTP/1.1 404 Not Found\r\n"
+      outputdata = b"Content-Type: text/html; charset=UTF-8\r\n\r\n"
+      acceptRng = b"Accept-Ranges: bytes\n"
+      acceptEncode = b"Vary: Accept-Encoding\n"
+      connect = b"Connection: close\n" 
+      cntLength = bin(f"Content-Length:{len(message)}\n")
+      modMsg = isValid + acceptRng + acceptEncode + connect + outputdata + cntLength
+      connectionSocket.sendto(modMsg,addr)
       #Close client socket
       #Fill in start
       connectionSocket.close()
