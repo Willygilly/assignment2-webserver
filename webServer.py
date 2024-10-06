@@ -9,7 +9,7 @@ def webServer(port=13331):
   serverSocket = socket(AF_INET, SOCK_STREAM)
   
   #Prepare a server socket
-  serverSocket.bind(("", port))
+  serverSocket.bind(("localhost", port))
   
   #Fill in start
   serverSocket.listen(1)
@@ -36,9 +36,12 @@ def webServer(port=13331):
 
       isValid = "HTTP/1.1 200 OK\r\n"     
       #Content-Type is an example on how to send a header as bytes. There are more!
-      outputdata = b"Content-Type: text/html; charset=UTF-8\r\n"
-      outputdata = f"Accept-Ranges: bytes\nVary: Accept-Encoding\nConnection: close\n"+ f"Content-Length:{len(message)}\n"+"Content-Type: text/html; charset=UTF-8\r\n\r\n"
-
+      outputdata = "Content-Type: text/html; charset=UTF-8\r\n\r\n"
+      rangeData = "Accept-Ranges: bytes\n"
+      encodingData = "Vary: Accept-Encoding\n"
+      connectData = "Connection: close\n"
+      cntData = f"Content-Length:{len(message)}\n"
+      serverData = "Server: Apache/2.4.7\n"
 
       #Note that a complete header must end with a blank line, creating the four-byte sequence "\r\n\r\n" Refer to https://w3.cs.jmu.edu/kirkpams/OpenCSF/Books/csf/html/TCPSockets.html
  
@@ -49,7 +52,7 @@ def webServer(port=13331):
         content += i  
       #Send the content of the requested file to the client (don't forget the headers you created)!
       #Send everything as one send command, do not send one line/item at a time!
-      modMsg = isValid + outputdata + content
+      modMsg = isValid + rangeData + encodingData + connectData+ serverData + cntData + outputdata + content
       # Fill in start
       connectionSocket.sendto(modMsg.encode('utf-8'),addr)
 
@@ -62,10 +65,18 @@ def webServer(port=13331):
       # Send response message for invalid request due to the file not being found (404)
       # Remember the format you used in the try: block!
       #Fill in start
-
+      print(e)
       #Fill in end
       isValid = "HTTP/1.1 404 Not Found\r\n"
-      connectionSocket.sendto(isValid.encode('utf-8'),addr)
+      outputdata = "Content-Type: text/html; charset=UTF-8\r\n\r\n"
+      rangeData = "Accept-Ranges: bytes\n"
+      encodingData = "Vary: Accept-Encoding\n"
+      connectData = "Connection: close\n"
+      cntData = f"Content-Length:{len(message)}\n"
+      serverData = "Server: Apache/2.4.7\n"
+      modMsg = isValid + rangeData + encodingData + connectData+ serverData + cntData + outputdata
+
+      connectionSocket.sendto(modMsg.encode('utf-8'),addr)
       #Close client socket
       #Fill in start
       connectionSocket.close()
@@ -78,3 +89,4 @@ def webServer(port=13331):
 
 if __name__ == "__main__":
   webServer(13331)
+
